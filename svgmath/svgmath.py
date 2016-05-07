@@ -7,6 +7,8 @@ import string
 import random
 import subprocess
 
+DEVNULL = open(os.devnull, 'wb')
+
 INLINE  = 'mode-inline'
 DISPLAY = 'mode-display'
 MARKER_STYLE = 'fill:rgb(72.898865%,85.499573%,33.299255%);fill-opacity:1;'
@@ -120,21 +122,21 @@ def _generate_svg(input, mode):
     # Run XeLaTeX
     subprocess.check_call(["xelatex",
                            "-output-directory", tmpdir,
-                           tex_file])
+                           tex_file], stdout=DEVNULL)
 
     # Crop if necessary
     if mode is DISPLAY:
       subprocess.check_call(["pdfcrop",
                              "-margins", "1",
                              pdf_file,
-                             pdf_file])
+                             pdf_file], stdout=DEVNULL)
 
     # Convert to SVG
     pdf2svg = os.path.join(
       os.path.dirname(os.path.abspath(__file__)),
       "pdf2svg"
     )
-    subprocess.check_call([pdf2svg, pdf_file, svg_file])
+    subprocess.check_call([pdf2svg, pdf_file, svg_file], stdout=DEVNULL)
 
     # Return file contents
     with open(svg_file,'r') as svg:
