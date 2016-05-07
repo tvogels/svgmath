@@ -122,6 +122,7 @@ def _generate_svg(input, mode):
     # Run XeLaTeX
     subprocess.check_call(["xelatex",
                            "-output-directory", tmpdir,
+                           "-halt-on-error",
                            tex_file], stdout=DEVNULL)
 
     # Crop if necessary
