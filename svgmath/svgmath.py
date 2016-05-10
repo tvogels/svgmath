@@ -6,6 +6,7 @@ import shutil
 import string
 import random
 import subprocess
+from util import which
 
 DEVNULL = open(os.devnull, 'wb')
 
@@ -14,6 +15,21 @@ DISPLAY = 'mode-display'
 MARKER_STYLE = 'fill:rgb(72.898865%,85.499573%,33.299255%);fill-opacity:1;'
 
 _keep_numbers_regex = re.compile("[^\d\.]")
+
+
+# Check dependencies
+if not which("pdf2svg"):
+  print("Please install pdf2svg (apt-get/yum/brew install pdf2svg)")
+  sys.exit()
+
+if not which("xelatex"):
+  print("Please install xelatex and the stanalone style (apt-get install texlive-xelatex & texlive-latex-extra)")
+  sys.exit()
+
+if not which("pdfcrop"):
+  print("Could not find the pdfcrop binary.")
+  sys.exit()
+
 
 
 def render(equation, mode=INLINE, font_family="Helvetica Neue",
@@ -119,11 +135,13 @@ def _generate_svg(input, mode):
     with open(tex_file,'w') as f:
       f.write(input)
 
+
     # Run XeLaTeX
     subprocess.check_call(["xelatex",
                            "-output-directory", tmpdir,
                            "-halt-on-error",
                            tex_file], stdout=DEVNULL)
+
 
     # Crop if necessary
     if mode is DISPLAY:
@@ -133,11 +151,7 @@ def _generate_svg(input, mode):
                              pdf_file], stdout=DEVNULL)
 
     # Convert to SVG
-    pdf2svg = os.path.join(
-      os.path.dirname(os.path.abspath(__file__)),
-      "pdf2svg"
-    )
-    subprocess.check_call([pdf2svg, pdf_file, svg_file], stdout=DEVNULL)
+    subprocess.check_call(["pdf2svg", pdf_file, svg_file], stdout=DEVNULL)
 
     # Return file contents
     with open(svg_file,'r') as svg:
@@ -154,13 +168,13 @@ def _latex_input(equation, mode=INLINE, font_family="Helvetica Neue",
     doctype = ['\documentclass[%dpt, preview]{standalone}' % font_size]
 
   packages = [
-    '\usepackage{amsmath}',
-    '\usepackage{amssymb}',
-    '\usepackage{mathspec}',
-    '\usepackage{xunicode}',
-    '\usepackage{xltxtra}',
-    '\usepackage{xcolor}',
-    '\usepackage{color}',
+    '\\usepackage{amsmath}',
+    '\\usepackage{amssymb}',
+    '\\usepackage{mathspec}',
+    '\\usepackage{xunicode}',
+    '\\usepackage{xltxtra}',
+    '\\usepackage{xcolor}',
+    '\\usepackage{color}',
   ]
 
   font_settings = [

@@ -1,1 +1,1 @@
-from svgmath import render
+from .svgmath import render
