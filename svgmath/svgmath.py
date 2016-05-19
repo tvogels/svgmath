@@ -55,12 +55,13 @@ def _parse_svg(svg, mode, x_height):
   # Parse the SVG
   soup = BeautifulSoup(svg, 'xml')
   surface = soup.find(id="surface1")
-  characters = list(surface.select('g'))
+  characters = list(surface.select('use'))
   # Add a class to all characters uniquify ID
   for char in characters:
-    char.use['class'] = "svgmath-symbol";
-    href = char.use['xlink:href']
-    char.use['xlink:href'] = href[0] + uid + href[1:]
+    href = char['xlink:href']
+    if (href.startswith("#glyph")):
+      char['class'] = "svgmath-symbol";
+      char['xlink:href'] = href[0] + uid + href[1:]
   # Uniquify symbol IDs
   for symb in soup.find_all("symbol"):
     symb['id'] = uid + symb['id']
