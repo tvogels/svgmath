@@ -158,6 +158,7 @@ def _generate_svg(input, mode):
     with open(svg_file,'r') as svg:
       return svg.read()
   finally:
+    # print(tmpdir)
     shutil.rmtree(tmpdir)
 
 
@@ -180,13 +181,13 @@ def _latex_input(equation, mode=INLINE, font_family="Helvetica Neue",
 
   font_settings = [
     '\setmainfont{%s}' % font_family,
-    '\setmathsfont(Digits,Latin,Greek){%s}' % font_family,
-    '\setmathrm{%s}' % font_family,
+    '\setmathsfont(Greek,Latin,Digits)[Scale=MatchLowercase]{%s}' % font_family,
+    '\setmathrm[Scale=MatchLowercase]{%s}' % font_family,
   ]
 
   marker_config = [
     '\definecolor{bada55}{RGB}{186,218,85}',
-    '\\newcommand{\markers}{\scalebox{.0001}{\color{bada55}.}\\raisebox{1ex}{\scalebox{.0001}{\color{bada55}.}}}'
+    '\\newcommand{\markers}{\scalebox{0.01}{\color{bada55}.}\\raisebox{1ex}{\scalebox{0.01}{\color{bada55}.}}}'
   ]
 
   if mode is INLINE:
